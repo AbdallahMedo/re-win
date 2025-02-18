@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "193019775915",
+    "project_id": "re-win-cc0a1",
+    "storage_bucket": "re-win-cc0a1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:193019775915:android:7159af34b706179dd520ee",
+        "android_client_info": {
+          "package_name": "com.example.recycling_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZRtdrcqDjRjVQPRszHNX-ouTAxQ9mlZk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
