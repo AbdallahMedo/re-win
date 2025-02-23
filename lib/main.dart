@@ -20,7 +20,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData.light().copyWith(scaffoldBackgroundColor: Colors.white),
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
       home: const SplashView(),
     );
   }

@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:recycling_app/views/glass_category.dart';
 import 'package:recycling_app/views/paper_category.dart';
@@ -7,11 +9,44 @@ import '../widgets/custom_list_items.dart';
 import '../widgets/scores.dart';
 import 'can_category.dart';
 
-class HomeView extends StatelessWidget {
-  const HomeView({super.key});
+class HomeView extends StatefulWidget {
+  String? firstName;
+
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  String firstName = "";
+  String lastName = "";
+  String imageUrl = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      DocumentSnapshot userDoc =
+          await _firestore.collection('users').doc(user.uid).get();
+      setState(() {
+        firstName = userDoc['firstName'];
+        lastName = userDoc['lastName'];
+        imageUrl = userDoc['imageUrl'] ?? "";
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    String displayName =
+        widget.firstName?.isNotEmpty == true ? widget.firstName! : "User";
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     bool isTablet = screenWidth > 600;
@@ -19,16 +54,19 @@ class HomeView extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         title: Row(
           children: [
-            const CircleAvatar(
-              backgroundImage: AssetImage("assets/images/person.png"),
+            CircleAvatar(
+              backgroundImage: imageUrl.isNotEmpty
+                  ? NetworkImage(imageUrl)
+                  : AssetImage("assets/images/person.png"),
               radius: 20.0,
             ),
             SizedBox(width: screenWidth * 0.02),
             Text(
-              "Hello, Jone",
+              "Hello, $displayName",
               style: TextStyle(
                 fontSize: isTablet ? 22 : 18,
                 fontWeight: FontWeight.bold,
@@ -111,25 +149,27 @@ class HomeView extends StatelessWidget {
               // Categories Responsive Grid
               Wrap(
                 spacing: screenWidth * 0.03,
-                runSpacing: screenHeight * 0.02,
+                runSpacing: screenHeight * 0.05,
                 alignment: WrapAlignment.center,
                 children: [
                   Category(
-                      imagePath: "assets/images/Plastic - PNG.png",
-                      title: "Plastic",
+                    imagePath: "assets/images/Plastic - PNG.png",
+                    title: "Plastic",
                     ontap: () {
                       Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => const PlasticCategory(),
                       ));
-                    },),
+                    },
+                  ),
                   Category(
-                      imagePath: "assets/images/Can - Png 1.png",
-                      title: "Can",
+                    imagePath: "assets/images/Can - Png 1.png",
+                    title: "Can",
                     ontap: () {
                       Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => const CanCategory(),
                       ));
-                    },),
+                    },
+                  ),
                   Category(
                     imagePath: "assets/images/Glass - PNG.png",
                     title: "Glass",

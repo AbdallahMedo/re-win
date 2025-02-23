@@ -1,8 +1,6 @@
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-
-import '../widgets/navigation.dart';
 import 'login_view.dart';
 
 class SplashView extends StatelessWidget {
@@ -16,7 +14,7 @@ class SplashView extends StatelessWidget {
       backgroundColor: Colors.white,
       splashIconSize: 250,
       duration: 3000,
-      animationDuration:const Duration(seconds: 1),
+      animationDuration:const Duration(seconds: 2),
     );
   }
 }

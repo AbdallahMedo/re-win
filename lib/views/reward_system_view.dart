@@ -11,9 +11,6 @@ class RewardSystemView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-    bool isTablet = screenWidth > 600;
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(

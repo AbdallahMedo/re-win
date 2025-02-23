@@ -1,19 +1,117 @@
-import 'package:flutter/material.dart';
-import 'package:recycling_app/views/login_view.dart';
+import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:recycling_app/views/login_view.dart';
+import '../services/auth_services.dart';
 import '../widgets/custom_elevated_button.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/navigation.dart';
 
-class ProfileView extends StatelessWidget {
+class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
+  @override
+  State<ProfileView> createState() => _ProfileViewState();
+}
+class _ProfileViewState extends State<ProfileView> {
+  final AuthServices _authServices = AuthServices();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
+  String firstName = "";
+  String lastName = "";
+  String phone = "";
+  String imageUrl = "";
+  File? _image;
 
+  @override
+  void initState() {
+    super.initState();
+    // _fetchUserData();
+  }
+  // Future<void> _fetchUserData() async {
+  //   User? user = FirebaseAuth.instance.currentUser;
+  //   if (user != null) {
+  //     DocumentSnapshot userDoc = await _firestore.collection('users').doc(user.uid).get();
+  //     setState(() {
+  //       firstName = userDoc['firstName'];
+  //       lastName = userDoc['lastName'];
+  //       phone = userDoc['phone'];
+  //       imageUrl = userDoc['imageUrl'] ?? "";
+  //     });
+  //   }
+  // }
+  // Future<void> _pickImage() async {
+  //   final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+  //   if (pickedFile != null) {
+  //     setState(() => _image = File(pickedFile.path));
+  //     await _uploadImage();
+  //   }
+  // }
+  // Future<void> _uploadImage() async {
+  //   if (_image == null) return;
+  //
+  //   try {
+  //     User? user = FirebaseAuth.instance.currentUser;
+  //     Reference ref = _storage.ref().child('profile_images/${user!.uid}.jpg');
+  //     await ref.putFile(_image!);
+  //     String downloadUrl = await ref.getDownloadURL();
+  //
+  //     await _firestore.collection('users').doc(user.uid).update({'imageUrl': downloadUrl});
+  //
+  //     setState(() {
+  //       imageUrl = downloadUrl;
+  //     });
+  //
+  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Image Uploaded!")));
+  //   } catch (e) {
+  //     print("Error uploading image: $e");
+  //   }
+  // }
+  // Future<void> _deleteImage() async {
+  //   try {
+  //     User? user = FirebaseAuth.instance.currentUser;
+  //     Reference ref = _storage.ref().child('profile_images/${user!.uid}.jpg');
+  //     await ref.delete();
+  //
+  //     await _firestore.collection('users').doc(user.uid).update({'imageUrl': ""});
+  //
+  //     setState(() {
+  //       imageUrl = "";
+  //     });
+  //
+  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Image Deleted!")));
+  //   } catch (e) {
+  //     print("Error deleting image: $e");
+  //   }
+  // }
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-    bool isTablet = screenWidth > 600;
+   // double screenHeight = MediaQuery.of(context).size.height;
+    TextEditingController _firstName=TextEditingController();
+    TextEditingController _phoneNumber=TextEditingController();
+    void _logout(BuildContext context) async {
+      await _authServices.logout();
 
+      Fluttertoast.showToast(
+        msg: "Logged out successfully!",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.black38,
+        textColor: Colors.white,
+      );
+
+      // Navigate back to login page and remove HomeView from stack
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginView()),
+      );
+    }
+    bool isTablet = screenWidth > 600;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -29,15 +127,7 @@ class ProfileView extends StatelessWidget {
         ),
         actions: [
           IconButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return LoginView();
-                    },
-                  ),
-                );
-              },
+              onPressed:()=>_logout(context),
               icon: Icon(Icons.login_outlined,color: Colors.green,)
           )
         ],
@@ -71,7 +161,7 @@ class ProfileView extends StatelessWidget {
                   CircleAvatar(
                     radius: isTablet ? 50 : 40,
                     backgroundImage:
-                        const AssetImage("assets/images/person.png"),
+                    imageUrl.isNotEmpty ? NetworkImage(imageUrl): AssetImage("assets/images/person.png"),
                   ),
                   const SizedBox(width: 15),
 
@@ -83,16 +173,17 @@ class ProfileView extends StatelessWidget {
                           child: CustomElevatedButton(
                             title: "Change Picture",
                             backColor: Colors.green,
-                            onpressed: () {},
+                            onpressed: (){},
                             color: Colors.white,
                           ),
                         ),
                         const SizedBox(width: 10),
+                        // if (imageUrl.isNotEmpty)
                         Expanded(
                           child: CustomElevatedButton(
                             title: "Delete Picture",
                             backColor: const Color(0xffF6F7F9),
-                            onpressed: () {},
+                            onpressed:(){},
                             color: Colors.red,
                           ),
                         ),
@@ -106,12 +197,12 @@ class ProfileView extends StatelessWidget {
 
               _buildSectionTitle("Username", isTablet),
               const SizedBox(height: 10),
-              CustomTextField(hintText: "Username"),
+              CustomTextField(hintText: "Username",controller: _firstName,),
               const SizedBox(height: 20),
 
-              _buildSectionTitle("Mobile Number", isTablet),
+              _buildSectionTitle("Phone Number", isTablet),
               const SizedBox(height: 10),
-              CustomTextField(hintText: "Mobile number"),
+              CustomTextField(hintText: "Phone number",controller: _phoneNumber,),
               SizedBox(height: isTablet ? 50 : 40),
 
               _buildSectionTitle("Choose payment method", isTablet),

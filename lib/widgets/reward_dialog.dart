@@ -39,7 +39,6 @@ class RewardDialog extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Expanded(
-            flex: 2,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

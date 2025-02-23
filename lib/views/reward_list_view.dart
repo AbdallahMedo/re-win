@@ -40,7 +40,9 @@ class RewardsListView extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Rewards"),
+        automaticallyImplyLeading: false,
+        title: const Text("Rewards",style:TextStyle(fontWeight: FontWeight.bold) ,),
+        centerTitle: true,
         backgroundColor: Colors.white,
       ),
       body: ListView.builder(
