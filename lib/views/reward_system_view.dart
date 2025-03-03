@@ -16,24 +16,24 @@ class RewardSystemView extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.green),
-          onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context){return RecycleApp();}));
-          },
-        ),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back, color: Colors.green),
+        //   onPressed: () {
+        //     // Navigator.push(context, MaterialPageRoute(builder: (context){return RecycleApp();}));
+        //   },
+        // ),
         title: const Text(
           "Reward System",
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
         ),
         centerTitle: true,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.person, color: Colors.green),
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context){return ProfileView();}));
-            },
-          ),
+          // IconButton(
+          //   icon: const Icon(Icons.person, color: Colors.green),
+          //   onPressed: () {
+          //     // Navigator.push(context, MaterialPageRoute(builder: (context){return ProfileView();}));
+          //   },
+          // ),
         ],
       ),
       body: Padding(

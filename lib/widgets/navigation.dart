@@ -1,7 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 import '../views/Profile_view.dart';
 import '../views/reward_list_view.dart';
 import '../views/reward_system_view.dart';
@@ -9,35 +6,37 @@ import '../views/home_view.dart';
 
 
 class RecycleApp extends StatefulWidget {
+  final String? firstName;
+  final String? lastName;
+  final String? phoneNumber;
+  final String? pasword;
 
-  // final String? firstName;
-  // final String? lastName;
-  // final String? phone;
 
-  // const RecycleApp({super.key, this.firstName, this.lastName, this.phone});
+  const RecycleApp({super.key, this.firstName,  this.lastName,  this.phoneNumber,  this.pasword, });
   @override
   _RecycleAppState createState() => _RecycleAppState();
 }
 
 class _RecycleAppState extends State<RecycleApp> {
-
-
-  final PageController _pageController = PageController(initialPage: 0);
-  late List<Widget> _pages;
-  int _selectedIndex = 0;
   @override
   void initState() {
-     _pages = [
-      HomeView(),
+    super.initState();
+    _pages = [
+      HomeView(firstName: widget.firstName ?? "user",),
       const RewardSystemView(),
       const RewardsListView(),
-      const ProfileView(),
+       ProfileView(
+         firstName:widget.firstName ?? 'user',
+         lastName: widget.lastName ?? 'last name',
+         phone: widget.phoneNumber ?? "NA",
+       ),
     ];
 
   }
+  final PageController _pageController = PageController(initialPage: 0);
+  late List<Widget> _pages;
+  int _selectedIndex = 0;
   // Pages
-
-
   // Handle Navigation
   void _onItemTapped(int index) {
     _pageController.animateToPage(
@@ -49,7 +48,6 @@ class _RecycleAppState extends State<RecycleApp> {
       _selectedIndex = index;
     });
   }
-
   // Handle back button on Android
   Future<bool> _onWillPop() async {
     if (_selectedIndex != 0) {
@@ -58,7 +56,6 @@ class _RecycleAppState extends State<RecycleApp> {
     }
     return true; // Allow exit if already on Home
   }
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(

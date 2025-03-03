@@ -1,55 +1,50 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:recycling_app/views/glass_category.dart';
 import 'package:recycling_app/views/paper_category.dart';
 import 'package:recycling_app/views/plastic_category.dart';
+import 'package:recycling_app/views/reward_list_view.dart';
+import 'package:recycling_app/views/reward_system_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/category.dart';
 import '../widgets/custom_list_items.dart';
+import '../widgets/navigation.dart';
 import '../widgets/scores.dart';
+import 'Profile_view.dart';
 import 'can_category.dart';
 
 class HomeView extends StatefulWidget {
-  String? firstName;
+  final String firstName;
 
+  const HomeView({super.key, required this.firstName});
   @override
   State<HomeView> createState() => _HomeViewState();
 }
 
 class _HomeViewState extends State<HomeView> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  String firstName = "";
-  String lastName = "";
-  String imageUrl = "";
+  String? imagePath;
 
   @override
   void initState() {
     super.initState();
-    _fetchUserData();
+    _loadProfileImage();
   }
 
-  Future<void> _fetchUserData() async {
-    User? user = _auth.currentUser;
-    if (user != null) {
-      DocumentSnapshot userDoc =
-          await _firestore.collection('users').doc(user.uid).get();
-      setState(() {
-        firstName = userDoc['firstName'];
-        lastName = userDoc['lastName'];
-        imageUrl = userDoc['imageUrl'] ?? "";
-      });
-    }
+  Future<void> _loadProfileImage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      imagePath = prefs.getString('profileImage');
+    });
   }
+  @override
 
   @override
   Widget build(BuildContext context) {
-    String displayName =
-        widget.firstName?.isNotEmpty == true ? widget.firstName! : "User";
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     bool isTablet = screenWidth > 600;
+
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -59,14 +54,13 @@ class _HomeViewState extends State<HomeView> {
         title: Row(
           children: [
             CircleAvatar(
-              backgroundImage: imageUrl.isNotEmpty
-                  ? NetworkImage(imageUrl)
-                  : AssetImage("assets/images/person.png"),
+              backgroundImage:imagePath != null
+                  ? FileImage(File(imagePath!)) : AssetImage("assets/images/person.png"),
               radius: 20.0,
             ),
             SizedBox(width: screenWidth * 0.02),
             Text(
-              "Hello, $displayName",
+              "Hello, ${widget.firstName}",
               style: TextStyle(
                 fontSize: isTablet ? 22 : 18,
                 fontWeight: FontWeight.bold,
@@ -226,6 +220,7 @@ class _HomeViewState extends State<HomeView> {
               ),
             ],
           ),
+
         ),
       ),
     );
