@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../services/auth_services.dart';
 import '../theme/theme_provider.dart';
 import '../widgets/custom_elevated_button.dart';
-import 'login_view.dart';
+import '../features/login/presentation/view/login_view.dart';
 
 class ProfileView extends StatefulWidget {
   final String firstName;

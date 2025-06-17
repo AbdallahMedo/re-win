@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../views/Profile_view.dart';
 import '../views/reward_list_view.dart';
 import '../views/reward_system_view.dart';
-import '../views/home_view.dart';
+import '../features/home/presentation/views/home_view.dart';
 
 
 class RecycleApp extends StatefulWidget {

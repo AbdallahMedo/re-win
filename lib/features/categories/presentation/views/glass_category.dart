@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-import '../widgets/navigation.dart';
 
-class PaperCategory extends StatefulWidget {
-  const PaperCategory({super.key});
+class GlassCategory extends StatefulWidget {
+  const GlassCategory({super.key});
 
   @override
-  _PaperCategoryState createState() => _PaperCategoryState();
+  _GlassCategoryState createState() => _GlassCategoryState();
 }
 
-class _PaperCategoryState extends State<PaperCategory> with SingleTickerProviderStateMixin {
+class _GlassCategoryState extends State<GlassCategory> with SingleTickerProviderStateMixin {
   ValueNotifier<double> scrollPosition = ValueNotifier<double>(0.6);
   late AnimationController _controller;
   late Animation<double> _animation;
@@ -49,25 +48,7 @@ class _PaperCategoryState extends State<PaperCategory> with SingleTickerProvider
         child: Column(
           children: [
             // Back Button
-            // Padding(
-            //   padding: EdgeInsets.all(isTablet ? 15.0 : 10.0),
-            //   child: Align(
-            //     alignment: Alignment.topLeft,
-            //     child: Container(
-            //       decoration: BoxDecoration(
-            //         color: const Color(0xffC9E6B0),
-            //         shape: BoxShape.rectangle,
-            //         borderRadius: BorderRadius.circular(10),
-            //       ),
-            //       child: IconButton(
-            //         icon: const Icon(Icons.arrow_back, color: Colors.green, size: 30),
-            //         onPressed: () {
-            //           // Navigator.push(context, MaterialPageRoute(builder: (context){return RecycleApp();}));
-            //         },
-            //       ),
-            //     ),
-            //   ),
-            // ),
+
 
             // Animated Image Container with Jump Effect
             AnimatedBuilder(
@@ -89,7 +70,7 @@ class _PaperCategoryState extends State<PaperCategory> with SingleTickerProvider
                     padding: EdgeInsets.all(isTablet ? 15 : 10),
                     height: imageSize,
                     child: Image.asset(
-                      "assets/images/recycling-paper.png",
+                      "assets/images/Glass - PNG.png",
                       fit: BoxFit.contain,
                     ),
                   );
@@ -137,7 +118,7 @@ class _PaperCategoryState extends State<PaperCategory> with SingleTickerProvider
 
                             // Title
                             Text(
-                              "How to recycle a paper?",
+                              "How to recycle a glass?",
                               style: TextStyle(
                                 fontSize: isTablet ? 24 : 20,
                                 fontWeight: FontWeight.bold,
@@ -147,10 +128,11 @@ class _PaperCategoryState extends State<PaperCategory> with SingleTickerProvider
 
                             // Description
                             Text(
-                              "1- Sort Your Paper – Separate newspapers, magazines, cardboard, and office paper. Avoid mixing them with plastic or metal.\n\n"
-                                  "2- Remove Contaminants – Take off staples, paper clips, tape, and plastic windows from envelopes.\n\n"
-                                  "3- Flatten & Bundle – Stack and tie paper together for easy collection.\n\n"
-                                  "4- Drop It Off or Use a Recycling Bin – Check your local recycling center's guidelines.",
+                              "1- Rinse the Glass – Clean out any food or liquid residue.\n\n"
+                                  "2- Remove Lids and Caps – Metal lids can be recycled separately, but plastic ones often cannot.\n\n"
+                                  "3- Sort by Color (if required) – Some centers prefer clear, green, and brown glass separated.\n\n"
+                                  "4- Don’t Break the Glass – Broken glass can be dangerous and harder to recycle.\n\n"
+                                  "5- Use Proper Recycling Bins – Or take glass to a designated recyclingcenter.",
                               style: TextStyle(fontSize: isTablet ? 18 : 16, color: Colors.black87),
                             ),
                           ],

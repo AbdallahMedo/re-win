@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-
-import '../widgets/navigation.dart';
-
-class GlassCategory extends StatefulWidget {
-  const GlassCategory({super.key});
+class CanCategory extends StatefulWidget {
+  const CanCategory({super.key});
 
   @override
-  _GlassCategoryState createState() => _GlassCategoryState();
+  _CanCategoryState createState() => _CanCategoryState();
 }
 
-class _GlassCategoryState extends State<GlassCategory> with SingleTickerProviderStateMixin {
+class _CanCategoryState extends State<CanCategory> with SingleTickerProviderStateMixin {
   ValueNotifier<double> scrollPosition = ValueNotifier<double>(0.6);
   late AnimationController _controller;
   late Animation<double> _animation;
@@ -48,28 +45,6 @@ class _GlassCategoryState extends State<GlassCategory> with SingleTickerProvider
       body: SafeArea(
         child: Column(
           children: [
-            // Back Button
-            // Padding(
-            //   padding: EdgeInsets.all(isTablet ? 15.0 : 10.0),
-            //   child: Align(
-            //     alignment: Alignment.topLeft,
-            //     child: Container(
-            //       decoration: BoxDecoration(
-            //         color: const Color(0xffC9E6B0),
-            //         shape: BoxShape.rectangle,
-            //         borderRadius: BorderRadius.circular(10),
-            //       ),
-            //       child: IconButton(
-            //         icon: const Icon(Icons.arrow_back, color: Colors.green, size: 30),
-            //         onPressed: () {
-            //           // Navigator.push(context, MaterialPageRoute(builder: (context){return RecycleApp();}));
-            //         },
-            //       ),
-            //     ),
-            //   ),
-            // ),
-
-            // Animated Image Container with Jump Effect
             AnimatedBuilder(
               animation: _animation,
               builder: (context, child) {
@@ -89,7 +64,7 @@ class _GlassCategoryState extends State<GlassCategory> with SingleTickerProvider
                     padding: EdgeInsets.all(isTablet ? 15 : 10),
                     height: imageSize,
                     child: Image.asset(
-                      "assets/images/Glass - PNG.png",
+                      "assets/images/Can - Png 1.png",
                       fit: BoxFit.contain,
                     ),
                   );
@@ -137,7 +112,7 @@ class _GlassCategoryState extends State<GlassCategory> with SingleTickerProvider
 
                             // Title
                             Text(
-                              "How to recycle a glass?",
+                              "How to recycle a can?",
                               style: TextStyle(
                                 fontSize: isTablet ? 24 : 20,
                                 fontWeight: FontWeight.bold,
@@ -147,11 +122,11 @@ class _GlassCategoryState extends State<GlassCategory> with SingleTickerProvider
 
                             // Description
                             Text(
-                              "1- Rinse the Glass – Clean out any food or liquid residue.\n\n"
-                                  "2- Remove Lids and Caps – Metal lids can be recycled separately, but plastic ones often cannot.\n\n"
-                                  "3- Sort by Color (if required) – Some centers prefer clear, green, and brown glass separated.\n\n"
-                                  "4- Don’t Break the Glass – Broken glass can be dangerous and harder to recycle.\n\n"
-                                  "5- Use Proper Recycling Bins – Or take glass to a designated recyclingcenter.",
+                              "1- Rinse the Can – Remove any leftover food or drink to prevent contamination.\n\n"
+                                  "2- Remove Labels (if possible) – Some recycling centers prefer cans without labels, but it’s not always required.\n\n"
+                                  "3- Crush the Can – Flattening cans saves space in recycling bins (but check local rules; some facilities prefer uncrushed cans for sorting).\n\n"
+                                  "4- Separate Different Types of Metal – Aluminum cans (like soda cans) are different from steel cans (like food cans).\n\n"
+                                  "5- Take to a Recycling Center or Use a Curbside Bin – Many places offer buy-back programs for aluminum cans.",
                               style: TextStyle(fontSize: isTablet ? 18 : 16, color: Colors.black87),
                             ),
                           ],

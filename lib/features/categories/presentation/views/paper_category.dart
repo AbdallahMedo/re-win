@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-import '../widgets/navigation.dart';
-
-class CanCategory extends StatefulWidget {
-  const CanCategory({super.key});
+class PaperCategory extends StatefulWidget {
+  const PaperCategory({super.key});
 
   @override
-  _CanCategoryState createState() => _CanCategoryState();
+  _PaperCategoryState createState() => _PaperCategoryState();
 }
 
-class _CanCategoryState extends State<CanCategory> with SingleTickerProviderStateMixin {
+class _PaperCategoryState extends State<PaperCategory> with SingleTickerProviderStateMixin {
   ValueNotifier<double> scrollPosition = ValueNotifier<double>(0.6);
   late AnimationController _controller;
   late Animation<double> _animation;
@@ -49,25 +47,7 @@ class _CanCategoryState extends State<CanCategory> with SingleTickerProviderStat
         child: Column(
           children: [
             // Back Button
-            // Padding(
-            //   padding: EdgeInsets.all(isTablet ? 15.0 : 10.0),
-            //   child: Align(
-            //     alignment: Alignment.topLeft,
-            //     child: Container(
-            //       decoration: BoxDecoration(
-            //         color: const Color(0xffC9E6B0),
-            //         shape: BoxShape.rectangle,
-            //         borderRadius: BorderRadius.circular(10),
-            //       ),
-            //       child: IconButton(
-            //         icon: const Icon(Icons.arrow_back, color: Colors.green, size: 30),
-            //         onPressed: () {
-            //           // Navigator.push(context, MaterialPageRoute(builder: (context){return RecycleApp();}));
-            //         },
-            //       ),
-            //     ),
-            //   ),
-            // ),
+            //
 
             // Animated Image Container with Jump Effect
             AnimatedBuilder(
@@ -89,7 +69,7 @@ class _CanCategoryState extends State<CanCategory> with SingleTickerProviderStat
                     padding: EdgeInsets.all(isTablet ? 15 : 10),
                     height: imageSize,
                     child: Image.asset(
-                      "assets/images/Can - Png 1.png",
+                      "assets/images/recycling-paper.png",
                       fit: BoxFit.contain,
                     ),
                   );
@@ -137,7 +117,7 @@ class _CanCategoryState extends State<CanCategory> with SingleTickerProviderStat
 
                             // Title
                             Text(
-                              "How to recycle a can?",
+                              "How to recycle a paper?",
                               style: TextStyle(
                                 fontSize: isTablet ? 24 : 20,
                                 fontWeight: FontWeight.bold,
@@ -147,11 +127,10 @@ class _CanCategoryState extends State<CanCategory> with SingleTickerProviderStat
 
                             // Description
                             Text(
-                              "1- Rinse the Can – Remove any leftover food or drink to prevent contamination.\n\n"
-                                  "2- Remove Labels (if possible) – Some recycling centers prefer cans without labels, but it’s not always required.\n\n"
-                                  "3- Crush the Can – Flattening cans saves space in recycling bins (but check local rules; some facilities prefer uncrushed cans for sorting).\n\n"
-                                  "4- Separate Different Types of Metal – Aluminum cans (like soda cans) are different from steel cans (like food cans).\n\n"
-                                  "5- Take to a Recycling Center or Use a Curbside Bin – Many places offer buy-back programs for aluminum cans.",
+                              "1- Sort Your Paper – Separate newspapers, magazines, cardboard, and office paper. Avoid mixing them with plastic or metal.\n\n"
+                                  "2- Remove Contaminants – Take off staples, paper clips, tape, and plastic windows from envelopes.\n\n"
+                                  "3- Flatten & Bundle – Stack and tie paper together for easy collection.\n\n"
+                                  "4- Drop It Off or Use a Recycling Bin – Check your local recycling center's guidelines.",
                               style: TextStyle(fontSize: isTablet ? 18 : 16, color: Colors.black87),
                             ),
                           ],

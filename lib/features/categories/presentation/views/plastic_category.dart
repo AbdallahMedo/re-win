@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-import '../widgets/navigation.dart';
-
 class PlasticCategory extends StatefulWidget {
   const PlasticCategory({super.key});
 
@@ -49,25 +47,7 @@ class _PlasticCategoryState extends State<PlasticCategory> with SingleTickerProv
         child: Column(
           children: [
             // Back Button
-            // Padding(
-            //   padding: EdgeInsets.all(isTablet ? 15.0 : 10.0),
-            //   child: Align(
-            //     alignment: Alignment.topLeft,
-            //     child: Container(
-            //       decoration: BoxDecoration(
-            //         color: const Color(0xffC9E6B0),
-            //         shape: BoxShape.rectangle,
-            //         borderRadius: BorderRadius.circular(10),
-            //       ),
-            //       child: IconButton(
-            //         icon: const Icon(Icons.arrow_back, color: Colors.green, size: 30),
-            //         onPressed: () {
-            //           // Navigator.push(context, MaterialPageRoute(builder: (context){return RecycleApp();}));
-            //         },
-            //       ),
-            //     ),
-            //   ),
-            // ),
+
 
             // Animated Image Container with Jump Effect
             AnimatedBuilder(

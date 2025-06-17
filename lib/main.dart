@@ -1,8 +1,14 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart'; // <-- Added
 import 'package:provider/provider.dart';
+
 import 'package:recycling_app/theme/theme_provider.dart';
-import 'package:recycling_app/views/splash_view.dart';
+import 'package:recycling_app/features/spalsh/presentation/view/splash_view.dart';
+import 'package:recycling_app/services/auth_services.dart'; // <-- Auth service for cubit
+
+import 'features/login/cubit/login_cubit.dart';
+import 'features/register/cubit/register_cubit.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -10,10 +16,19 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => ThemeProvider(),
-      child: const MyApp(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => ThemeProvider()),
+      ],
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (context) => RegisterCubit(AuthServices())),
+          BlocProvider(create: (context) => LoginCubit(AuthServices())),
+        ],
+        child: const MyApp(),
+      ),
     ),
   );
 }
@@ -21,15 +36,14 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      themeMode: themeProvider.themeMode, // This controls light/dark mode
-      theme: themeProvider.lightTheme,    // Light theme
-      darkTheme: themeProvider.darkTheme, // Dark theme
+      themeMode: themeProvider.themeMode,
+      theme: themeProvider.lightTheme,
+      darkTheme: themeProvider.darkTheme,
       home: const SplashView(),
     );
   }
