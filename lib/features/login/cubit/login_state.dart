@@ -1,18 +1,29 @@
 
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:equatable/equatable.dart';
 
-abstract class LoginState {}
+abstract class LoginState extends Equatable {
+  const LoginState();
+
+  @override
+  List<Object> get props => [];
+}
 
 class LoginInitial extends LoginState {}
 
 class LoginLoading extends LoginState {}
 
 class LoginSuccess extends LoginState {
-  final User user;
-  LoginSuccess(this.user);
+  final String uid;
+  const LoginSuccess(this.uid);
+
+  @override
+  List<Object> get props => [uid];
 }
 
 class LoginFailure extends LoginState {
   final String error;
-  LoginFailure(this.error);
+  const LoginFailure(this.error);
+
+  @override
+  List<Object> get props => [error];
 }

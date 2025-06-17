@@ -1,9 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:recycling_app/features/login/presentation/view/login_view.dart';
-import 'package:recycling_app/widgets/navigation.dart';
+
+import '../../../../widgets/navigation.dart';
+import '../../../login/presentation/view/login_view.dart';
 import '../../../login/presentation/widgets/custom_password_field.dart';
 import '../../../login/presentation/widgets/custom_text_field.dart';
 import '../../cubit/register_cubit.dart';
@@ -24,44 +26,48 @@ class _RegisterViewState extends State<RegisterView> {
   bool isChecked = false;
 
   void _register() {
-    String firstName = _firstName.text.trim();
-    String lastName = _lastName.text.trim();
-    String phone = _phoneNumber.text.trim();
-    String password = _password.text.trim();
+    if (_validateInputs()) {
+      context.read<RegisterCubit>().registerUser(
+        firstName: _firstName.text.trim(),
+        lastName: _lastName.text.trim(),
+        phone: _phoneNumber.text.trim(),
+        password: _password.text.trim(),
+      );
+    }
+  }
 
-    if (firstName.isEmpty || lastName.isEmpty || phone.isEmpty || password.isEmpty) {
-      Fluttertoast.showToast(msg: "All fields are required", backgroundColor: Colors.black38);
-      return;
+  bool _validateInputs() {
+    if (_firstName.text.isEmpty ||
+        _lastName.text.isEmpty ||
+        _phoneNumber.text.isEmpty ||
+        _password.text.isEmpty) {
+      Fluttertoast.showToast(msg: "All fields are required");
+      return false;
     }
 
     if (!isChecked) {
-      Fluttertoast.showToast(msg: "You must accept the terms and conditions!", backgroundColor: Colors.black38);
-      return;
+      Fluttertoast.showToast(msg: "Please accept terms & conditions");
+      return false;
     }
 
-    if (phone.length != 11) {
-      Fluttertoast.showToast(msg: "Phone number must be 11 digits.");
-      return;
+    if (_phoneNumber.text.length != 11) {
+      Fluttertoast.showToast(msg: "Phone must be 11 digits");
+      return false;
     }
 
-    if (password.length < 6) {
-      Fluttertoast.showToast(msg: "Password must be at least 6 characters.");
-      return;
+    if (_password.text.length < 6) {
+      Fluttertoast.showToast(msg: "Password must be 6+ characters");
+      return false;
     }
 
-    context.read<RegisterCubit>().registerUser(
-      firstName: firstName,
-      lastName: lastName,
-      phone: phone,
-      password: password,
-    );
+    return true;
   }
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-    bool isTablet = screenWidth > 600;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isTablet = screenWidth > 600;
 
     return Scaffold(
       backgroundColor: const Color(0xff0B3D02),
@@ -71,14 +77,15 @@ class _RegisterViewState extends State<RegisterView> {
             showDialog(
               context: context,
               barrierDismissible: false,
-              builder: (_) => Center(child: CircularProgressIndicator(color:Colors.green,)),
+              builder: (_) => const Center(child: CircularProgressIndicator(color: Colors.green)),
             );
           } else if (state is RegisterSuccess) {
-            Navigator.pop(context); // remove loading
+            Navigator.pop(context);
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
                 builder: (context) => RecycleApp(
+                  uid: state.uid,
                   firstName: _firstName.text.trim(),
                   lastName: _lastName.text.trim(),
                   phoneNumber: _phoneNumber.text.trim(),
@@ -86,7 +93,7 @@ class _RegisterViewState extends State<RegisterView> {
               ),
             );
           } else if (state is RegisterFailure) {
-            Navigator.pop(context); // remove loading
+            Navigator.pop(context);
             Fluttertoast.showToast(msg: state.error);
           }
         },
@@ -101,14 +108,6 @@ class _RegisterViewState extends State<RegisterView> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 8,
-                    spreadRadius: 2,
-                    offset: Offset(0, 4),
-                  ),
-                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -247,4 +246,3 @@ class _RegisterViewState extends State<RegisterView> {
     );
   }
 }
-

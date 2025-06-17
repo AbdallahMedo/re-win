@@ -1,83 +1,101 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import '../widgets/reward_item.dart';
 import '../widgets/reward_web_view.dart';
 
 class RewardsListView extends StatefulWidget {
-  const RewardsListView({super.key});
+  final String uid; // Accept user UID as parameter
+  const RewardsListView({super.key, required this.uid});
 
   @override
   State<RewardsListView> createState() => _RewardsListViewState();
 }
 
 class _RewardsListViewState extends State<RewardsListView> {
-  final DatabaseReference _databaseRef = FirebaseDatabase.instance.ref("re-win");
-
+  late DatabaseReference _databaseRef;
   int plastic = 0;
   int can = 0;
   int glass = 0;
-  int totalRecycled = 0; // Track total recycled items (not points)
-  int total=0;
+  int totalRecycled = 0;
+  int total = 0;
+  StreamSubscription<DatabaseEvent>? _dataSubscription;
+  StreamSubscription<DatabaseEvent>? _connectionSubscription;
 
   @override
   void initState() {
     super.initState();
-    _listenToFirebase();
-    _listenToFirebaseTotalPoints();
+    _databaseRef = FirebaseDatabase.instance.ref("users/${widget.uid}/recycling_data");
+    _setupConnectionMonitoring();
+    _setupRealtimeUpdates();
   }
 
-  void _listenToFirebase() {
-    _databaseRef.onValue.listen((event) {
-      final data = event.snapshot.value;
-      if (data is Map<dynamic, dynamic>) {
-        setState(() {
-          plastic = (data['plastic'] ?? 0) as int;
-          can = (data['can'] ?? 0) as int;
-          glass = (data['glass'] ?? 0) as int;
-          totalRecycled = (data['totalRecycled'] ?? 0) as int; // Load from Firebase
-        });
-
-        // Update totalRecycled in Firebase whenever counts change
-        _updateTotalRecycled();
-      }
+  void _setupConnectionMonitoring() {
+    _connectionSubscription = FirebaseDatabase.instance
+        .ref('.info/connected')
+        .onValue
+        .listen((event) {
+      final connected = event.snapshot.value as bool? ?? false;
+      print("Firebase connection: $connected");
     });
   }
 
-  void _updateTotalRecycled() {
-    final newTotalRecycled = plastic + can + glass;
-
-    // Only update if the value changed
-    if (newTotalRecycled != totalRecycled) {
-      _databaseRef.update({'totalRecycled': newTotalRecycled});
-    }
-  }
-
-
-  void _listenToFirebaseTotalPoints() {
-    _databaseRef.onValue.listen((event) {
+  void _setupRealtimeUpdates() {
+    _dataSubscription = _databaseRef.onValue.listen((DatabaseEvent event) {
       final data = event.snapshot.value;
-      if (data is Map<dynamic, dynamic>) {
+      if (data is Map<dynamic, dynamic> && mounted) {
+        final newPlastic = (data['plastic'] ?? 0) as int;
+        final newCan = (data['can'] ?? 0) as int;
+        final newGlass = (data['glass'] ?? 0) as int;
+
+        print("""
+        New data received:
+        - Plastic: $newPlastic
+        - Can: $newCan
+        - Glass: $newGlass
+        """);
+
         setState(() {
-          plastic = (data['plastic'] ?? 0) as int;
-          can = (data['can'] ?? 0) as int;
-          glass = (data['glass'] ?? 0) as int;
+          plastic = newPlastic;
+          can = newCan;
+          glass = newGlass;
+          totalRecycled = (data['totalRecycled'] ?? 0) as int;
           total = (data['total'] ?? 0) as int;
         });
 
-        // Calculate and update total whenever individual items change
-        _updateTotal();
+        _updateCalculatedValues();
       }
+    }, onError: (error) {
+      print("Firebase error: $error");
     });
   }
 
-  void _updateTotal() {
-    // Calculate the new total
-    final newTotal = (plastic + can + glass) * 50;
+  Future<void> _updateCalculatedValues() async {
+    try {
+      final newTotalRecycled = plastic + can + glass;
+      final newTotal = newTotalRecycled * 50;
 
-    // Only update if the total has changed
-    if (newTotal != total) {
-      _databaseRef.update({'total': newTotal});
+      final updates = {
+        if (newTotalRecycled != totalRecycled) 'totalRecycled': newTotalRecycled,
+        if (newTotal != total) 'total': newTotal,
+      };
+
+      if (updates.isNotEmpty) {
+        print("Attempting to write updates: $updates");
+        await _databaseRef.update(updates);
+        print("Updates written successfully");
+      }
+    } catch (e) {
+      print("Failed to update calculated values: $e");
     }
+  }
+
+  @override
+  void dispose() {
+    _dataSubscription?.cancel();
+    _connectionSubscription?.cancel();
+    super.dispose();
   }
 
   @override
@@ -122,7 +140,7 @@ class _RewardsListViewState extends State<RewardsListView> {
                 Icon(Icons.emoji_events, color: Colors.amber[800], size: 20),
                 const SizedBox(width: 4),
                 Text(
-                  "${(plastic + can + glass) * 50} pts",
+                  "$total pts",
                   style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 14,

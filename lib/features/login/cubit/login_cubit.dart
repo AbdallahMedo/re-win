@@ -1,18 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../../services/auth_services.dart';
 import 'login_state.dart';
 
 class LoginCubit extends Cubit<LoginState> {
   final AuthServices _authServices;
+  bool rememberMe = false;
 
   LoginCubit(this._authServices) : super(LoginInitial()) {
     _checkPersistedLogin();
   }
-
-  bool rememberMe = false;
 
   void toggleRememberMe(bool value) {
     rememberMe = value;
@@ -32,14 +30,13 @@ class LoginCubit extends Cubit<LoginState> {
 
   Future<void> login({required String phone, required String password}) async {
     emit(LoginLoading());
+    phone = phone.trim();
+    password = password.trim();
 
     try {
-      phone = phone.trim();
-      password = password.trim();
+      final uid = await _authServices.signIn(phone, password);
 
-      final user = await _authServices.signIn(phone, password);
-
-      if (user != null) {
+      if (uid != null) {
         final prefs = await SharedPreferences.getInstance();
         if (rememberMe) {
           await prefs.setBool('isLoggedIn', true);
@@ -50,22 +47,37 @@ class LoginCubit extends Cubit<LoginState> {
           await prefs.remove('phone');
           await prefs.remove('password');
         }
-        emit(LoginSuccess(user));
+        emit(LoginSuccess(uid)); // Now passing UID to success state
       } else {
-        emit(LoginFailure("Invalid phone or password."));
+        emit( LoginFailure("Invalid phone or password."));
       }
     } on FirebaseAuthException catch (e) {
-      // ... (keep existing error handling)
+      String errorMessage;
+      switch (e.code) {
+        case 'user-not-found':
+          errorMessage = "No user found for this phone number.";
+          break;
+        case 'wrong-password':
+          errorMessage = "Incorrect password. Try again.";
+          break;
+        default:
+          errorMessage = "Login failed. Please try again.";
+      }
+      emit(LoginFailure(errorMessage));
     } catch (e) {
-      // ... (keep existing error handling)
+      emit(LoginFailure("An unexpected error occurred: ${e.toString()}"));
     }
   }
 
   Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('isLoggedIn');
-    await prefs.remove('phone');
-    await prefs.remove('password');
-    emit(LoginInitial());
-  }
-}
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('isLoggedIn');
+      await prefs.remove('phone');
+      await prefs.remove('password');
+      await _authServices.signOut();
+      emit(LoginInitial());
+    } catch (e) {
+      emit(LoginFailure("Logout failed: ${e.toString()}"));
+    }
+  }}

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:recycling_app/views/Profile_view.dart';
+import 'package:recycling_app/features/profile/presentation/view/Profile_view.dart';
 import '../widgets/navigation.dart';
 import '../widgets/recycling_tip.dart';
 import '../widgets/reward_card.dart';

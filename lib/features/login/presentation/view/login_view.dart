@@ -1,5 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -47,7 +46,7 @@ class _LoginViewState extends State<LoginView> {
   Widget build(BuildContext context) {
     if (_isCheckingLogin) {
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator(color: Colors.green,)),
+        body: Center(child: CircularProgressIndicator(color: Colors.green)),
       );
     }
 
@@ -71,7 +70,7 @@ class _LoginViewState extends State<LoginView> {
               builder: (context, constraints) {
                 double containerWidth = constraints.maxWidth * 0.85;
                 if (constraints.maxWidth > 600) {
-                  containerWidth = 400; // Fixed width for tablets
+                  containerWidth = 400;
                 }
 
                 return BlocConsumer<LoginCubit, LoginState>(
@@ -79,12 +78,12 @@ class _LoginViewState extends State<LoginView> {
                     if (state is LoginFailure) {
                       Fluttertoast.showToast(msg: state.error);
                     } else if (state is LoginSuccess) {
-                      _navigateToHome(context, state.user);
+                      _navigateToHome(context, state.uid);
                     }
                   },
                   builder: (context, state) {
                     if (state is LoginSuccess) {
-                      return const Center(child: CircularProgressIndicator());
+                      return const Center(child: CircularProgressIndicator(color: Colors.white,));
                     }
 
                     return Container(
@@ -165,25 +164,25 @@ class _LoginViewState extends State<LoginView> {
                               onPressed: state is LoginLoading
                                   ? null
                                   : () {
-                                      if (_phoneNumber.text.isEmpty ||
-                                          _password.text.isEmpty) {
-                                        Fluttertoast.showToast(
-                                            msg: "All fields are required");
-                                        return;
-                                      }
-                                      context.read<LoginCubit>().login(
-                                            phone: _phoneNumber.text.trim(),
-                                            password: _password.text.trim(),
-                                          );
-                                    },
+                                if (_phoneNumber.text.isEmpty ||
+                                    _password.text.isEmpty) {
+                                  Fluttertoast.showToast(
+                                      msg: "All fields are required");
+                                  return;
+                                }
+                                context.read<LoginCubit>().login(
+                                  phone: _phoneNumber.text.trim(),
+                                  password: _password.text.trim(),
+                                );
+                              },
                               child: state is LoginLoading
                                   ? const CircularProgressIndicator(
-                                      color: Colors.white)
+                                  color: Colors.white)
                                   : const Text(
-                                      "Login",
-                                      style: TextStyle(
-                                          fontSize: 18, color: Colors.white),
-                                    ),
+                                "Login",
+                                style: TextStyle(
+                                    fontSize: 18, color: Colors.white),
+                              ),
                             ),
                           ),
                           const SizedBox(height: 15),
@@ -198,7 +197,7 @@ class _LoginViewState extends State<LoginView> {
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                          const RegisterView(),
+                                      const RegisterView(),
                                     ),
                                   );
                                 },
@@ -225,24 +224,28 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
-  Future<void> _navigateToHome(BuildContext context, User user) async {
-    // Fetch user data from Firestore
-    var userData = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
+  Future<void> _navigateToHome(BuildContext context, String uid) async {
+    // Get user data from Realtime Database
+    final userSnapshot = await FirebaseDatabase.instance
+        .ref()
+        .child('users/$uid')
         .get();
-    String firstName = userData['firstName'] ?? "User";
-    String lastName = userData['lastName'] ?? "User";
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => RecycleApp(
-          firstName: firstName,
-          phoneNumber: _phoneNumber.text.trim(),
-          lastName: lastName,
+    if (userSnapshot.exists) {
+      final userData = userSnapshot.value as Map<dynamic, dynamic>;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => RecycleApp(
+            uid: uid, // THIS IS THE CRUCIAL ADDITION
+            firstName: userData['firstName'] ?? "User",
+            lastName: userData['lastName'] ?? "User",
+            phoneNumber: _phoneNumber.text.trim(),
+          ),
         ),
-      ),
-    );
-  }
-}
+      );
+    } else {
+      Fluttertoast.showToast(msg: "User data not found");
+      context.read<LoginCubit>().logout();
+    }
+  }}
